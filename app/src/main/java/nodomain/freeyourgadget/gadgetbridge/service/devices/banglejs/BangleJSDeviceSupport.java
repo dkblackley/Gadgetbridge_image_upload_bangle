@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RequestQueue;
@@ -65,6 +66,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.UUID;
 import java.lang.reflect.Field;
@@ -96,6 +98,7 @@ import nodomain.freeyourgadget.gadgetbridge.model.ActivityKind;
 import nodomain.freeyourgadget.gadgetbridge.model.Alarm;
 import nodomain.freeyourgadget.gadgetbridge.model.BatteryState;
 import nodomain.freeyourgadget.gadgetbridge.model.CalendarEventSpec;
+import nodomain.freeyourgadget.gadgetbridge.service.btle.BtLEQueue;
 import nodomain.freeyourgadget.gadgetbridge.util.calendar.CalendarEvent;
 import nodomain.freeyourgadget.gadgetbridge.util.calendar.CalendarManager;
 import nodomain.freeyourgadget.gadgetbridge.model.CallSpec;
@@ -116,6 +119,7 @@ import nodomain.freeyourgadget.gadgetbridge.util.LimitedQueue;
 import nodomain.freeyourgadget.gadgetbridge.util.Prefs;
 
 import static nodomain.freeyourgadget.gadgetbridge.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_ALLOW_HIGH_MTU;
+import static nodomain.freeyourgadget.gadgetbridge.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_BANGLEJS_TEXT_BITMAP_SIZE;
 import static nodomain.freeyourgadget.gadgetbridge.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_DEVICE_INTERNET_ACCESS;
 import static nodomain.freeyourgadget.gadgetbridge.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_DEVICE_INTENTS;
 import static nodomain.freeyourgadget.gadgetbridge.activities.devicesettings.DeviceSettingsPreferenceConst.PREF_BANGLEJS_TEXT_BITMAP;
@@ -140,6 +144,8 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
     private boolean realtimeHRM = false;
     private boolean realtimeStep = false;
     private int realtimeHRMInterval = 30*60;
+    /// Last battery percentage reported (or -1) to help with smoothing reported battery levels
+    private int lastBatteryPercent = -1;
 
     private final LimitedQueue/*Long*/ mNotificationReplyAction = new LimitedQueue(16);
 
@@ -176,12 +182,17 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
                 switch (intent.getAction()) {
                     case BANGLEJS_COMMAND_TX: {
                         String data = String.valueOf(intent.getExtras().get("DATA"));
-                        try {
-                            TransactionBuilder builder = performInitialized("TX");
-                            uartTx(builder, data);
-                            builder.queue(getQueue());
-                        } catch (IOException e) {
-                            GB.toast(getContext(), "Error in TX: " + e.getLocalizedMessage(), Toast.LENGTH_LONG, GB.ERROR);
+                        BtLEQueue queue = getQueue();
+                        if (queue==null) {
+                            LOG.warn("BANGLEJS_COMMAND_TX received, but getQueue()==null (state=" + gbDevice.getStateString() + ")");
+                        } else {
+                            try {
+                                TransactionBuilder builder = performInitialized("TX");
+                                uartTx(builder, data);
+                                builder.queue(queue);
+                            } catch (IOException e) {
+                                GB.toast(getContext(), "Error in TX: " + e.getLocalizedMessage(), Toast.LENGTH_LONG, GB.ERROR);
+                            }
                         }
                         break;
                     }
@@ -264,6 +275,7 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
 
         getDevice().setFirmwareVersion("N/A");
         getDevice().setFirmwareVersion2("N/A");
+        lastBatteryPercent = -1;
 
         LOG.info("Initialization Done");
 
@@ -437,16 +449,25 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
             } break;
             case "status": {
                 GBDeviceEventBatteryInfo batteryInfo = new GBDeviceEventBatteryInfo();
+                batteryInfo.state = BatteryState.UNKNOWN;
+                if (json.has("chg")) {
+                    batteryInfo.state = (json.getInt("chg") == 1) ? BatteryState.BATTERY_CHARGING : BatteryState.BATTERY_NORMAL;
+                }
                 if (json.has("bat")) {
                     int b = json.getInt("bat");
                     if (b < 0) b = 0;
                     if (b > 100) b = 100;
+                    // smooth out battery level reporting (it can only go up if charging, or down if discharging)
+                    // http://forum.espruino.com/conversations/379294
+                    if (lastBatteryPercent<0) lastBatteryPercent = b;
+                    if (batteryInfo.state == BatteryState.BATTERY_NORMAL && b > lastBatteryPercent)
+                        b = lastBatteryPercent;
+                    if (batteryInfo.state == BatteryState.BATTERY_CHARGING && b < lastBatteryPercent)
+                        b = lastBatteryPercent;
+                    lastBatteryPercent = b;
                     batteryInfo.level = b;
-                    batteryInfo.state = BatteryState.BATTERY_NORMAL;
                 }
-                if (json.has("chg") && json.getInt("chg") == 1) {
-                    batteryInfo.state = BatteryState.BATTERY_CHARGING;
-                }
+
                 if (json.has("volt"))
                     batteryInfo.voltage = (float) json.getDouble("volt");
                 handleGBDeviceEvent(batteryInfo);
@@ -536,10 +557,41 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
                 }
                 final String id = _id;
 
-
                 if (BuildConfig.INTERNET_ACCESS && devicePrefs.getBoolean(PREF_DEVICE_INTERNET_ACCESS, false)) {
                     RequestQueue queue = Volley.newRequestQueue(getContext());
                     String url = json.getString("url");
+
+                    int method = Request.Method.GET;
+                    if (json.has("method")) {
+                        String m = json.getString("method").toLowerCase();
+                        if (m.equals("get")) method = Request.Method.GET;
+                        else if (m.equals("post")) method = Request.Method.POST;
+                        else if (m.equals("head")) method = Request.Method.HEAD;
+                        else if (m.equals("put")) method = Request.Method.PUT;
+                        else if (m.equals("delete")) method = Request.Method.DELETE;
+                        else uartTxJSONError("http", "Unknown HTTP method "+m,id);
+                    }
+
+                    byte[] _body = null;
+                    if (json.has("body"))
+                        _body = json.getString("body").getBytes();
+                    final byte[] body = _body;
+
+                    Map<String,String> _headers = null;
+                    if (json.has("headers")) {
+                        JSONObject h = json.getJSONObject("headers");
+                        _headers = new HashMap<String,String>();
+                        Iterator<String> iter = h.keys();
+                        while (iter.hasNext()) {
+                            String key = iter.next();
+                            try {
+                                String value = h.getString(key);
+                                _headers.put(key, value);
+                            } catch (JSONException e) {
+                            }
+                        }
+                    }
+                    final Map<String,String> headers = _headers;
 
                     String _xmlPath = "";
                     try {
@@ -548,7 +600,7 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
                     }
                     final String xmlPath = _xmlPath;
                     // Request a string response from the provided URL.
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    StringRequest stringRequest = new StringRequest(method, url,
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
@@ -579,7 +631,27 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
                             JSONObject o = new JSONObject();
                             uartTxJSONError("http", error.toString(),id);
                         }
-                    });
+                    }) {
+                        @Override
+                        public byte[] getBody() throws AuthFailureError {
+                            if (body == null) return super.getBody();
+                            return body;
+                        }
+
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map<String, String> h = super.getHeaders();
+                            if (headers != null) {
+                                Iterator<String> iter = headers.keySet().iterator();
+                                while (iter.hasNext()) {
+                                    String key = iter.next();
+                                    String value = headers.get(key);
+                                    h.put(key, value);
+                                }
+                            }
+                            return h;
+                        }
+                    };
                     queue.add(stringRequest);
                 } else {
                     if (BuildConfig.INTERNET_ACCESS)
@@ -591,10 +663,17 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
             case "intent": {
                 Prefs devicePrefs = new Prefs(GBApplication.getDeviceSpecificSharedPrefs(gbDevice.getAddress()));
                 if (devicePrefs.getBoolean(PREF_DEVICE_INTENTS, false)) {
-                    String action = json.getString("action");
-                    JSONObject extra = json.getJSONObject("extra");
                     Intent in = new Intent();
-                    in.setAction(action);
+                    if (json.has("action")) in.setAction((String)json.get("action"));
+                    if (json.has("category")) in.addCategory((String)json.get("category"));
+                    if (json.has("mimetype")) in.setType((String)json.get("mimetype"));
+                    if (json.has("data")) in.setData(Uri.parse((String)json.get("data")));
+                    if (json.has("package") && !json.has("class")) in.setPackage((String)json.getString("package"));
+                    if (json.has("package") && json.has("class")) in.setClassName((String)json.getString("package"), (String)json.getString("class"));
+                    String target = "";
+                    if (json.has("target"))  target = (String)json.get("target");
+                    JSONObject extra = new JSONObject();
+                    if (json.has("extra")) extra = json.getJSONObject("extra");
                     if (extra != null) {
                         Iterator<String> iter = extra.keys();
                         while (iter.hasNext()) {
@@ -602,12 +681,32 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
                             in.putExtra(key, extra.getString(key));
                         }
                     }
-                    LOG.info("Sending intent " + action);
-                    this.getContext().getApplicationContext().sendBroadcast(in);
+                    LOG.info("Sending intent: " + String.valueOf(in));
+                    switch (target) {
+                        case "":
+                            // This case should make sure intents matched to the original Bangle.js Gadgetbridge intents implementation still work.
+                            this.getContext().getApplicationContext().sendBroadcast(in);
+                            break;
+                        case "broadcastreceiver":
+                            this.getContext().getApplicationContext().sendBroadcast(in);
+                            break;
+                        case "activity":
+                            in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            this.getContext().getApplicationContext().startActivity(in);
+                            break;
+                        case "service": // Targeting 'Service' is not yet implemented.
+                            LOG.info("Targeting 'Service' not yet implemented.");
+                            GB.toast(getContext(), "Targeting '"+target+"' is not yet implemented.", Toast.LENGTH_LONG, GB.INFO);
+                            // Use jobInfo() and jobScheduler to program this part? Context.startService()? Context.bindService()?
+                            break;
+                        default:
+                            LOG.info("Targeting '"+target+"' isn't implemented or doesn't exist.");
+                            GB.toast(getContext(), "Targeting '"+target+"' isn't implemented or it doesn't exist.", Toast.LENGTH_LONG, GB.INFO);
+                    }
                 } else {
                     uartTxJSONError("intent", "Android Intents not enabled, check Gadgetbridge Device Settings");
-                }
-            } break;
+                } break;
+            }
             case "force_calendar_sync": {
                 //if(!GBApplication.getPrefs().getBoolean("enable_calendar_sync", false)) return;
                 //pretty much like the updateEvents in CalendarReceiver, but would need a lot of libraries here
@@ -720,7 +819,7 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
         for(Emoji emoji : EmojiUtils.getAllEmojis())
             if (word.contains(emoji.getEmoji())) hasEmoji = true;
         // if we had emoji, ensure we create 3 bit color (not 1 bit B&W)
-        return "\0"+bitmapToEspruinoString(textToBitmap(word), hasEmoji ? BangleJSBitmapStyle.RGB_3BPP : BangleJSBitmapStyle.MONOCHROME);
+        return "\0"+bitmapToEspruinoString(textToBitmap(word), hasEmoji ? BangleJSBitmapStyle.RGB_3BPP_TRANSPARENT : BangleJSBitmapStyle.MONOCHROME_TRANSPARENT);
     }
 
     public String renderUnicodeAsImage(String txt) {
@@ -1043,6 +1142,8 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
             o.put("title", calendarEventSpec.title);
             o.put("description", calendarEventSpec.description);
             o.put("location", calendarEventSpec.location);
+            o.put("calName", calendarEventSpec.calName);
+            o.put("color", calendarEventSpec.color);
             o.put("allDay", calendarEventSpec.allDay);
             uartTxJSON("onAddCalendarEvent", o);
         } catch (JSONException e) {
@@ -1097,7 +1198,8 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
 
     public Bitmap textToBitmap(String text) {
         Paint paint = new Paint(0); // Paint.ANTI_ALIAS_FLAG not wanted as 1bpp
-        paint.setTextSize(18);
+        Prefs devicePrefs = new Prefs(GBApplication.getDeviceSpecificSharedPrefs(gbDevice.getAddress()));
+        paint.setTextSize(devicePrefs.getInt(PREF_BANGLEJS_TEXT_BITMAP_SIZE, 18));
         paint.setColor(0xFFFFFFFF);
         paint.setTextAlign(Paint.Align.LEFT);
         float baseline = -paint.ascent(); // ascent() is negative
@@ -1110,8 +1212,10 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
     }
 
     public enum BangleJSBitmapStyle {
-        MONOCHROME,
-        RGB_3BPP
+        MONOCHROME, // 1bpp
+        MONOCHROME_TRANSPARENT, // 1bpp, black = transparent
+        RGB_3BPP, // 3bpp
+        RGB_3BPP_TRANSPARENT // 3bpp, least used color as transparent
     };
 
     /** Used for writing single bits to an array */
@@ -1145,12 +1249,14 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
     public static byte[] bitmapToEspruinoArray(Bitmap bitmap, BangleJSBitmapStyle style) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-        int bpp = (style==BangleJSBitmapStyle.RGB_3BPP) ? 3 : 1;
+        int bpp = (style==BangleJSBitmapStyle.RGB_3BPP ||
+                   style==BangleJSBitmapStyle.RGB_3BPP_TRANSPARENT) ? 3 : 1;
         byte pixels[] = new byte[width * height];
         final byte PIXELCOL_TRANSPARENT = -1;
         final int ditherMatrix[] = {1*16,5*16,7*16,3*16}; // for bayer dithering
-        // if doing 3bpp, check image to see if it's transparent
-        boolean allowTransparency = (style != BangleJSBitmapStyle.MONOCHROME);
+        // if doing RGB_3BPP_TRANSPARENT, check image to see if it's transparent
+        // MONOCHROME_TRANSPARENT is handled later on...
+        boolean allowTransparency = (style == BangleJSBitmapStyle.RGB_3BPP_TRANSPARENT);
         boolean isTransparent = false;
         byte transparentColorIndex = 0;
         /* Work out what colour index each pixel should be and write to pixels.
@@ -1175,9 +1281,9 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
                 g += ditherAmt;
                 b += ditherAmt;
                 int col = 0;
-                if (style == BangleJSBitmapStyle.MONOCHROME)
+                if (bpp==1)
                     col = ((r+g+b) >= 768)?1:0;
-                else if (style == BangleJSBitmapStyle.RGB_3BPP)
+                else if (bpp==3)
                     col = ((r>=256)?1:0) | ((g>=256)?2:0) | ((b>=256)?4:0);
                 if (!pixelTransparent) colUsage[col]++; // if not transparent, record usage
                 // save colour, mark transparent separately
@@ -1198,6 +1304,11 @@ public class BangleJSDeviceSupport extends AbstractBTLEDeviceSupport {
             for (n=0;n<pixels.length;n++)
                 if (pixels[n]==PIXELCOL_TRANSPARENT)
                     pixels[n] = transparentColorIndex;
+        }
+        // if we're MONOCHROME_TRANSPARENT, force transparency on bg color
+        if (style == BangleJSBitmapStyle.MONOCHROME_TRANSPARENT) {
+            isTransparent = true;
+            transparentColorIndex = 0;
         }
         // Write the header
         int headerLen = isTransparent ? 4 : 3;

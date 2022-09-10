@@ -25,6 +25,8 @@ public class HybridHRWatchfaceSettings implements Serializable {
     private int wristFlickDuration = 2200;
     private int wristFlickMoveHour = 360;
     private int wristFlickMoveMinute = -360;
+    private String toggleWidgetsEvent = "";
+    private String toggleBacklightEvent = "";
     private boolean powersaveDisplay = false;
     private boolean powersaveHands = false;
     private boolean lightUpOnNotification = false;
@@ -98,6 +100,22 @@ public class HybridHRWatchfaceSettings implements Serializable {
         } else {
             this.wristFlickMoveMinute = wristFlickMoveMinute;
         }
+    }
+
+    public String getToggleWidgetsEvent() {
+        return toggleWidgetsEvent;
+    }
+
+    public void setToggleWidgetsEvent(String event) {
+        this.toggleWidgetsEvent = event;
+    }
+
+    public String getToggleBacklightEvent() {
+        return toggleBacklightEvent;
+    }
+
+    public void setToggleBacklightEvent(String event) {
+        this.toggleBacklightEvent = event;
     }
 
     public boolean getPowersaveDisplay() {

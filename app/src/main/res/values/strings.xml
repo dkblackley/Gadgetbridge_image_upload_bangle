@@ -12,11 +12,11 @@
     <string name="about_description_banglejs_main">Android companion app for Bangle.js built on top of the Gadgetbridge project, with added Internet Access.\n\nDue to Google Play Store policies, we are not allowed a donation link in the app itself, but if you like this app please consider donating via the Gadgetbridge homepage below.</string>
     <string name="gadgetbridge_running_banglejs_main">Bangle.js running</string>
 
-    <string name="application_name_banglejs_nopebble">Bangle.js Gadgetbridge</string>
-    <string name="title_activity_controlcenter_banglejs_nopebble">Bangle.js Gadgetbridge</string>
-    <string name="about_activity_title_banglejs_nopebble">About Bangle.js Gadgetbridge</string>
-    <string name="about_description_banglejs_nopebble">Android companion app for Bangle.js built on top of the Gadgetbridge project, with added Internet Access.\n\nDue to Google Play Store policies, we are not allowed a donation link in the app itself, but if you like this app please consider donating via the Gadgetbridge homepage below.</string>
-    <string name="gadgetbridge_running_banglejs_nopebble">Bangle.js running</string>
+    <string name="application_name_banglejs_nightly">Bangle.js Gadgetbridge (Nightly)</string>
+    <string name="title_activity_controlcenter_banglejs_nightly">Bangle.js Gadgetbridge (Nightly)</string>
+    <string name="about_activity_title_banglejs_nightly">About Bangle.js Gadgetbridge (Nightly)</string>
+    <string name="about_description_banglejs_nightly">Android companion app for Bangle.js built on top of the Gadgetbridge project, with added Internet Access.\n\nDue to Google Play Store policies, we are not allowed a donation link in the app itself, but if you like this app please consider donating via the Gadgetbridge homepage below.</string>
+    <string name="gadgetbridge_running_banglejs_nightly">Nightly Bangle.js running</string>
 
     <string name="application_name_main_nightly">Gadgetbridge (Nightly)</string>
     <string name="title_activity_controlcenter_main_nightly">Gadgetbridge Nightly</string>
@@ -56,6 +56,8 @@
     <string name="controlcenter_snackbar_connecting">Connecting…</string>
     <string name="controlcenter_snackbar_requested_screenshot">Taking a screenshot of the device</string>
     <string name="controlcenter_calibrate_device">Calibrate Device</string>
+    <string name="controlcenter_get_heartrate_measurement">Get heart rate measurement</string>
+
     <string name="device_card_activity_card_title">Activity info on device card</string>
     <string name="device_card_activity_card_title_summary">Choose what activity details are displayed on device card</string>
     <string name="prefs_activity_in_device_card_title">Show Activity info on device card</string>
@@ -129,6 +131,8 @@
     <string name="fw_upgrade_notice_miband4">You are about to install the %s firmware on your Mi Band 4.\n\nPlease make sure to install the .fw file, and after that the .res file. Your band will reboot after installing the .fw file.\n\nNote: You do not have to install .res if it is exactly the same as the one previously installed.\n\nPROCEED AT YOUR OWN RISK!</string>
     <string name="fw_upgrade_notice_miband5">You are about to install the %s firmware on your Mi Band 5.\n\nPlease make sure to install the .fw file, and after that the .res file. Your band will reboot after installing the .fw file.\n\nNote: You do not have to install .res if it is exactly the same as the one previously installed.\n\nPROCEED AT YOUR OWN RISK!</string>
     <string name="fw_upgrade_notice_miband6">You are about to install the %s firmware on your Mi Band 6.\n\nPlease make sure to install the .fw file, and after that the .res file. Your band will reboot after installing the .fw file.\n\nNote: You do not have to install .res if it is exactly the same as the one previously installed.\n\nPROCEED AT YOUR OWN RISK!</string>
+    <string name="fw_upgrade_notice_miband7">You are about to install the %s firmware on your Xiaomi Smart Band 7.\n\nYour band will reboot after installing the .zip file.\n\nPROCEED AT YOUR OWN RISK!</string>
+    <string name="fw_upgrade_notice_amazfit_gts3">You are about to install the %s firmware on your Amazfit GTS 3.\n\nYour band will reboot after installing the .zip file.\n\nPROCEED AT YOUR OWN RISK!</string>
     <string name="fw_upgrade_notice_amazfitx">You are about to install the %s firmware on your Amazfit X.\n\nPlease make sure to install the .fw file, and after that the .res file. Your band will reboot after installing the .fw file.\n\nNote: You do not have to install .res if it is exactly the same as the one previously installed.\n\nPROCEED AT YOUR OWN RISK!</string>
     <string name="fw_upgrade_notice_amazfitneo">You are about to install the %s firmware on your Amazfit Neo.
 \n
@@ -156,6 +160,12 @@
     <string name="pref_header_general">General settings</string>
     <string name="pref_header_other">Other</string>
     <string name="pref_header_system">System</string>
+    <string name="pref_header_calendar">Calendar</string>
+    <string name="pref_header_connection">Connection</string>
+    <string name="pref_header_display">Display</string>
+    <string name="pref_header_health">Health</string>
+    <string name="pref_header_time">Time</string>
+    <string name="pref_header_workout">Workout</string>
     <string name="pref_header_equalizer">Equalizer</string>
     <string name="pref_title_general_autoconnectonbluetooth">Connect to Gadgetbridge device when Bluetooth is turned on</string>
     <string name="pref_title_general_autostartonboot">Start automatically</string>
@@ -188,6 +198,10 @@
     <string name="pref_title_notifications_generic">Generic notification support</string>
     <string name="pref_title_notifications_generic_settings">Android notification settings</string>
     <string name="pref_title_whenscreenon">…also when screen is on</string>
+    <string name="pref_title_notifications_ignore_low_priority">Ignore low priority notifications</string>
+    <string name="pref_summary_notifications_ignore_low_priority">Do not send low and minimum priority notifications to the watch</string>
+    <string name="pref_title_notification_prefer_long_text">Prefer long notification text</string>
+    <string name="pref_summary_notification_prefer_long_text">If available, send the long notification text to the device</string>
     <string name="pref_title_notification_filter">Do Not Disturb</string>
     <string name="pref_summary_notification_filter">Block all notifications when Do Not Disturb is enabled on the phone</string>
     <string name="pref_header_notification_application_settings">Per application settings</string>
@@ -198,6 +212,8 @@
     <string name="pref_summary_transliteration">Enable this if your device has no support for your language\'s font</string>
     <string name="pref_title_banglejs_text_bitmap">Text as Bitmaps</string>
     <string name="pref_summary_banglejs_text_bitmap">If a word cannot be rendered with the watch\'s font, render it to a bitmap in Gadgetbridge and display the bitmap on the watch</string>
+    <string name="pref_title_banglejs_txt_bitmap_size">Text Bitmaps Size</string>
+    <string name="pref_summary_banglejs_txt_bitmap_size">If \'Text as Bitmaps\' enabled, what size should text be rendered?</string>
     <string name="pref_title_banglejs_webview_url">App loader URL</string>
     <string name="pref_summary_banglejs_webview_url">If you want a custom app loader put your https://…/android.html URL here. Otherwise leave blank for https://banglejs.com/apps</string>
     <string name="pref_title_rtl">Right-To-Left</string>
@@ -224,6 +240,7 @@
     <string name="pref_blacklist_calendars_summary">Blacklisted calendars will not be synced to the device</string>
     <string name="pref_header_cannned_messages">Canned messages</string>
     <string name="pref_title_canned_replies">Replies</string>
+    <string name="pref_summary_canned_replies">Reply from the watch using preset messages</string>
     <string name="pref_title_canned_reply_suffix">Common suffix</string>
     <string name="pref_title_canned_messages_dismisscall">Call Dismissal</string>
     <string name="pref_title_canned_messages_set">Update on device</string>
@@ -248,6 +265,8 @@
     <string name="pref_summary_custom_deviceicon">Show a device specific Android notification icon instead the Gadgetbridge icon when connected</string>
     <string name="pref_title_autoremove_notifications">Autoremove dismissed notifications</string>
     <string name="pref_summary_autoremove_notifications">Notifications are automatically removed from the device when dismissed from the phone</string>
+    <string name="pref_title_screen_on_on_notifications">Screen On on Notifications</string>
+    <string name="pref_summary_screen_on_on_notifications">Turn on the band\'s screen when a notification arrives</string>
     <string name="pref_title_pebble_privacy_mode">Privacy mode</string>
     <string name="pref_pebble_privacy_mode_off">Normal notifications</string>
     <string name="pref_pebble_privacy_mode_content">Shift the notification text off-screen</string>
@@ -288,7 +307,7 @@
     <string name="pref_title_device_internet_access">Allow Internet Access</string>
     <string name="pref_summary_device_internet_access">Allow apps on this device to access the internet</string>
     <string name="pref_title_device_intents">Allow Intents</string>
-    <string name="pref_summary_device_intents">Allow Bangle.js watch apps to send Android Intents, and allow other apps on Android (like Tasker) to send data to Bangle.js with the com.banglejs.uart.tx Intent.</string>
+    <string name="pref_summary_device_intents">Allow Bangle.js watch apps to send Android Intents, and allow other apps on Android (like Tasker) to send data to Bangle.js with the com.banglejs.uart.tx Intent. Needs permission to display over other apps to work in the background.</string>
     <string name="pref_summary_sync_calendar">Enables calendar alerts, even when disconnected</string>
     <string name="pref_title_sync_caldendar">Sync calendar events</string>
     <string name="pref_summary_relax_firmware_checks">Relax firmware checks</string>
@@ -476,6 +495,9 @@
     <string name="watch9_pairing_tap_hint">When your watch vibrates, shake the device or press its button.</string>
     <string name="title_activity_sleepmonitor">Sleep monitor</string>
     <string name="pref_write_logfiles">Write log files</string>
+    <string name="pref_cache_weather">Cache weather information</string>
+    <string name="pref_cache_weather_summary">Weather information will be cached across application restarts.</string>
+    <string name="pref_write_logfiles_not_available">File logging initialization failed, writing log files is currently not available. Restart the application to attempt to initialize the log files again.</string>
     <string name="initializing">Initializing</string>
     <string name="busy_task_fetch_activity_data">Fetching activity data</string>
     <string name="sleep_activity_date_range">From %1$s to %2$s</string>
@@ -515,10 +537,13 @@
     <string name="interval_fifteen_minutes">every 15 minutes</string>
     <string name="interval_thirty_minutes">every 30 minutes</string>
     <string name="interval_forty_five_minutes">every 45 minutes</string>
+    <string name="heartrate_bpm_40">40 bpm</string>
+    <string name="heartrate_bpm_45">45 bpm</string>
+    <string name="heartrate_bpm_50">50 bpm</string>
     <string name="heartrate_bpm_100">100 bpm</string>
     <string name="heartrate_bpm_105">105 bpm</string>
     <string name="heartrate_bpm_110">110 bpm</string>
-    <string name="heartrate_bpm_112">112 bpm</string>
+    <string name="heartrate_bpm_115">115 bpm</string>
     <string name="heartrate_bpm_120">120 bpm</string>
     <string name="heartrate_bpm_125">125 bpm</string>
     <string name="heartrate_bpm_130">130 bpm</string>
@@ -526,6 +551,10 @@
     <string name="heartrate_bpm_140">140 bpm</string>
     <string name="heartrate_bpm_145">145 bpm</string>
     <string name="heartrate_bpm_150">150 bpm</string>
+    <string name="spo2_perc_80">80%</string>
+    <string name="spo2_perc_85">85%</string>
+    <string name="spo2_perc_90">90%</string>
+    <string name="spo2_off">Off</string>
     <string name="interval_one_hour">once an hour</string>
     <string name="stats_title">Speed zones</string>
     <string name="stats_x_axis_label">Total minutes</string>
@@ -585,12 +614,19 @@
     <string name="prefs_heartrate_alert_experimental_title">Heart rate alert (experimental)</string>
     <string name="prefs_heartrate_alert_experimental_description">Vibrate the band when the heart rate is over a threshold, without any obvious physical activity in the last 10 minutes. This feature is experimental, and was not extensively tested.</string>
     <string name="prefs_heartrate_alert_threshold">Heart rate alert threshold</string>
+    <string name="prefs_heartrate_alert_high_threshold">High heart rate alert threshold</string>
+    <string name="prefs_heartrate_alert_low_threshold">Low heart rate alert threshold</string>
     <string name="prefs_stress_monitoring_title">Stress monitoring</string>
     <string name="prefs_stress_monitoring_description">Monitor stress level while resting</string>
+    <string name="prefs_relaxation_reminder_title">Relaxation reminder</string>
+    <string name="prefs_relaxation_reminder_description">Vibrate the band to notify you if the stress value is higher than 80</string>
+    <string name="prefs_spo2_monitoring_title">Blood Oxygen Monitoring</string>
+    <string name="prefs_spo2_monitoring_description">Automatically monitor the blood oxygen levels throughout the day</string>
+    <string name="prefs_spo2_alert_threshold">SPO2 alert threshold</string>
     <string name="prefs_activity_monitoring_title">Activity monitoring</string>
     <string name="prefs_activity_monitoring_description">Automatically increase the heart rate detection frequency when the band detects physical exercise, to increase heart rate capture accuracy.</string>
     <string name="dbaccess_error_executing">Error executing \'%1$s\'</string>
-    <string name="controlcenter_start_activitymonitor">Your activity (ALPHA)</string>
+    <string name="controlcenter_start_activitymonitor">Your activity</string>
     <string name="cannot_connect">Cannot connect: %1$s</string>
     <string name="installer_activity_unable_to_find_handler">Unable to find a handler to install this file.</string>
     <string name="pbw_install_handler_unable_to_install">Unable to install the given file: %1$s</string>
@@ -661,7 +697,16 @@
     <string name="battery">Battery</string>
     <string name="no_limit">No limit</string>
     <string name="seconds_5">5 seconds</string>
+    <string name="seconds_6">6 seconds</string>
+    <string name="seconds_7">7 seconds</string>
+    <string name="seconds_8">8 seconds</string>
+    <string name="seconds_9">9 seconds</string>
     <string name="seconds_10">10 seconds</string>
+    <string name="seconds_11">11 seconds</string>
+    <string name="seconds_12">12 seconds</string>
+    <string name="seconds_13">13 seconds</string>
+    <string name="seconds_14">14 seconds</string>
+    <string name="seconds_15">15 seconds</string>
     <string name="seconds_20">20 seconds</string>
     <string name="seconds_30">30 seconds</string>
     <string name="minutes_1">1 minute</string>
@@ -700,6 +745,7 @@
     <string name="miband_prefs_reserve_reminder_calendar">Reminders to reserve for upcoming events</string>
     <string name="prefs_reserve_reminder_calendar_summary">Number of calendar events that will be synchronized</string>
     <string name="miband_prefs_hr_sleep_detection">Use heart rate sensor to improve sleep detection</string>
+    <string name="pref_sleep_breathing_quality_monitoring">Sleep breathing quality monitoring</string>
     <string name="miband_prefs_device_time_offset_hours">Device time offset in hours (for detecting sleep of shift workers)</string>
     <string name="prefs_find_phone">Find phone</string>
     <string name="prefs_enable_find_phone">Turn on \'Find phone\'</string>
@@ -736,6 +782,8 @@
     <string name="mi2_prefs_inactivity_warnings_dnd_summary">Disable inactivity warnings for a time interval</string>
     <string name="mi2_prefs_heart_rate_monitoring">Heart Rate Monitoring</string>
     <string name="mi2_prefs_heart_rate_monitoring_summary">Configure heart rate monitoring</string>
+    <string name="prefs_always_on_display">Always On Display</string>
+    <string name="prefs_always_on_display_summary">Keep the band\'s display always on</string>
     <string name="prefs_password">Password</string>
     <string name="prefs_password_summary">Lock the band with a password when removed from the wrist</string>
     <string name="prefs_password_enabled">Password Enabled</string>
@@ -752,6 +800,7 @@
     <string name="bip_prefs_shortcuts">Shortcuts</string>
     <string name="bip_prefs_shotcuts_summary">Choose the shortcuts on the band screen</string>
     <string name="prefs_activate_display_on_lift_sensitivity">Sensitivity</string>
+    <string name="prefs_screen_timeout">Screen Timeout</string>
     <string name="mi5_prefs_workout_activity_types">Workout Activity Types</string>
     <string name="mi5_prefs_workout_activity_types_summary">Choose the activity types to display on the workouts screen</string>
     <string name="pref_title_force_white_color_scheme">Force black on white color scheme</string>
@@ -924,10 +973,12 @@
     <string name="mi2_enable_text_notifications">Text notifications</string>
     <string name="mi2_enable_text_notifications_summary"><![CDATA[Needs firmware >= 1.0.1.28 and Mili_pro.ft* installed.]]></string>
     <string name="on">On</string>
+    <string name="smart">Smart</string>
     <string name="off">Off</string>
     <string name="normal">Normal</string>
     <string name="sensitive">Sensitive</string>
     <string name="mi2_dnd_off">Off</string>
+    <string name="mi2_dnd_always">Always</string>
     <string name="mi3_night_mode_sunset">At sunset</string>
     <string name="mi2_dnd_automatic">Automatic (sleep detection)</string>
     <string name="mi2_dnd_scheduled">Scheduled (time interval)</string>
@@ -998,6 +1049,7 @@
     <string name="kind_agps_bundle">AGPS Bundle</string>
     <string name="kind_resources">Resources</string>
     <string name="kind_watchface">Watchface</string>
+    <string name="kind_app">App</string>
     <string name="devicetype_unknown">Unknown Device</string>
     <string name="devicetype_test">Test Device</string>
     <string name="add_test_device">Add test device</string>
@@ -1008,6 +1060,8 @@
     <string name="devicetype_miband4">Mi Band 4</string>
     <string name="devicetype_miband5">Mi Band 5</string>
     <string name="devicetype_miband6">Mi Band 6</string>
+    <string name="devicetype_miband7">Xiaomi Smart Band 7</string>
+    <string name="devicetype_amazfit_gts3">Amazfit GTS 3</string>
     <string name="devicetype_amazfit_band5">Amazfit Band 5</string>
     <string name="devicetype_amazfit_neo">Amazfit Neo</string>
     <string name="devicetype_amazfit_bip">Amazfit Bip</string>
@@ -1067,6 +1121,7 @@
     <string name="devicetype_sony_wh_1000xm4">Sony WH-1000XM4</string>
     <string name="devicetype_sony_wf_sp800n">Sony WF-SP800N</string>
     <string name="devicetype_sony_wf_1000xm3">Sony WF-1000XM3</string>
+    <string name="devicetype_binary_sensor">Binary sensor</string>
     <string name="choose_auto_export_location">Choose export location</string>
     <string name="notification_channel_name">General</string>
     <string name="notification_channel_high_priority_name">High-priority</string>
@@ -1119,6 +1174,12 @@
     <string name="menuitem_barometer">Barometer</string>
     <string name="menuitem_flashlight">Flashlight</string>
     <string name='menuitem_email'>E-mail</string>
+    <string name='menuitem_countdown'>Countdown</string>
+    <string name='menuitem_personal_activity_intelligence'>Personal Activity Intelligence</string>
+    <string name='menuitem_workout_history'>Workout History</string>
+    <string name='menuitem_female_health'>Female Health</string>
+    <string name='menuitem_workout_status'>Workout Status</string>
+    <string name="menuitem_unknown_app">Unknown (%s)</string>
     <string name="watch9_time_minutes">Minutes:</string>
     <string name="watch9_time_hours">Hours:</string>
     <string name="watch9_time_seconds">Seconds:</string>
@@ -1131,7 +1192,9 @@
     <string name="preferences_rtl_settings">Right To Left Support</string>
     <string name="share_log">Share log</string>
     <string name="share_log_warning">Please keep in mind Gadgetbridge logs files that may contain lots of personal info, including but not limited to health data, unique identifiers (such as a device\'s MAC address), music preferences, etc. Consider editing the file and removing this info before sending the file to a public issue report.</string>
+    <string name="share_log_not_enabled_message">You must first enable logging in the Settings - Write log files</string>
     <string name="warning">Warning!</string>
+    <string name="note">Note</string>
     <string name="no_data">No data</string>
     <!-- LED Color -->
     <string name="preferences_led_color">LED Color</string>
@@ -1233,9 +1296,10 @@
     <string name="about_additional_contributions">Many thanks to all unlisted contributors for contributing code, translations, support, ideas, motivation, bug reports, money… ✊</string>
     <string name="about_links">Links</string>
     <string name="permission_granting_mandatory">All these permissions are required and instability might occur if not granted</string>
-    <string name="permission_notification_listener">%1$s needs access to Notifications in order to display them on your watch when your phone\'s screen is off.\n\nPlease tap \'%2$s\' then \'%1$s\' and enable \'Allow Notification Access\', then tap \'Back\' to return to %1$s</string>
-    <string name="permission_notification_policy_access">%1$s needs access to Do Not Disturb settings in order to honour them on your watch when your phone\'s screen is off.\n\nPlease tap \'%2$s\' then \'%1$s\' and enable \'Allow Do Not Disturb\', then tap \'Back\' to return to %1$s</string>
+    <string name="permission_notification_listener">%1$s needs access to Notifications in order to display them on your watch when your phone\'s screen is off.\n\nPlease tap \'%2$s\' then \'%1$s\' and enable \'Allow Notification Access\', then tap \'Back\' to return to %1$s.</string>
+    <string name="permission_notification_policy_access">%1$s needs access to Do Not Disturb settings in order to honour them on your watch when your phone\'s screen is off.\n\nPlease tap \'%2$s\' then \'%1$s\' and enable \'Allow Do Not Disturb\', then tap \'Back\' to return to %1$s.</string>
     <string name="permission_location">%1$s needs access to your location in the background to allow it to stay connected to your watch even when your screen is off.\n\nPlease tap \'%2$s\' to agree.</string>
+    <string name="permission_display_over_other_apps">%1$s needs permission to display over other apps in order to let Bangle.js watches start activities via intents when %1$s is in the background.\n\nThis can be used to start a music app and play a song, and many other things.\n\nPlease tap \'%2$s\' then \'%1$s\' and enable \'Allow display over other apps\', then tap \'Back\' to return to %1$s.</string>
     <string name="error_version_check_extreme_caution">CAUTION: Error when checking version information! You should not continue! Saw version name \"%s\"</string>
     <string name="require_location_provider">Location must be enabled</string>
     <string name="companiondevice_pairing">CompanionDevice Pairing</string>
@@ -1380,7 +1444,7 @@
     <string name="medley">Medley</string>
     <string name="devicetype_nut_mini">Nut mini</string>
     <string name="qhybrid_calibration_align_hint">Use the buttons below to align the watch hands to 12:00.</string>
-    <string translatable="false" name="lorem_ipsum">Lorem Ipsum</string>
+    <string name="lorem_ipsum" translatable="false">Lorem Ipsum</string>
     <plurals name="widget_alarm_target_hours">
         <item quantity="one">%d hour</item>
         <item quantity="two">%d hours</item>
@@ -1433,8 +1497,6 @@
     <string name="button_watchface_add_widget">Add widget</string>
     <string name="button_watchface_settings">Watchface settings</string>
     <string name="watchface_dialog_title_set_name">Set watchface name</string>
-    <string name="watchface_toast_settings_incomplete">Settings incomplete, widget not added</string>
-    <string name="watchface_dialog_title_add_widget">Add widget</string>
     <string name="watchface_widget_type_date">Date</string>
     <string name="watchface_widget_type_weather">Weather</string>
     <string name="watchface_widget_type_steps">Steps</string>
@@ -1442,28 +1504,37 @@
     <string name="button_watchface_preview">Preview on watch</string>
     <string name="button_watchface_save_apply">Save and apply</string>
     <string name="appmanager_app_edit">Edit</string>
-    <string name="watchface_dialog_widget_type">Type:</string>
-    <string name="watchface_dialog_widget_x_coordinate">X coordinate (max 240):</string>
-    <string name="watchface_dialog_widget_y_coordinate">Y coordinate (max 240):</string>
-    <string name="watchface_dialog_widget_presets">Position presets:</string>
+    <string name="watchface_dialog_widget_cat_generic">Generic</string>
+    <string name="watchface_dialog_widget_cat_position">Position</string>
+    <string name="watchface_dialog_widget_cat_2nd_tz_widget">2nd timezone widget</string>
+    <string name="watchface_dialog_widget_cat_custom_widget">Custom widget</string>
+    <string name="watchface_dialog_widget_type">Type</string>
+    <string name="watchface_dialog_widget_x_coordinate">X coordinate (max 240)</string>
+    <string name="watchface_dialog_widget_y_coordinate">Y coordinate (max 240)</string>
+    <string name="watchface_dialog_widget_presets">Position presets</string>
     <string name="watchface_dialog_widget_preset_top">Top</string>
     <string name="watchface_dialog_widget_preset_bottom">Bottom</string>
     <string name="watchface_dialog_widget_preset_left">Left</string>
     <string name="watchface_dialog_widget_preset_right">Right</string>
     <string name="qhybrid_title_watchface_designer">Watchface designer</string>
-    <string name="watchface_dialog_widget_color">Color:</string>
+    <string name="watchface_dialog_widget_color">Color</string>
     <string name="watchface_dialog_widget_color_white">White</string>
     <string name="watchface_dialog_widget_color_black">Black</string>
     <string name="watchface_dialog_title_settings">Watchface settings</string>
+    <string name="watchface_dialog_title_widget">Widget settings</string>
+    <string name="watchface_dialog_widget_width">Widget width (in pixels)</string>
     <string name="watchface_setting_title_display_refresh_timeout">Display refresh timeout</string>
-    <string name="watchface_setting_display_refresh_full">Full refresh (in minutes):</string>
-    <string name="watchface_setting_display_refresh_partial">Partial refresh (in minutes):</string>
+    <string name="watchface_setting_display_refresh_full">Full refresh (in minutes)</string>
+    <string name="watchface_setting_display_refresh_partial">Partial refresh (in minutes)</string>
     <string name="watchface_setting_title_wrist_flick">Wrist flick</string>
     <string name="watchface_setting_desc_wrist_flick">(to disable completely, enable relative movement and set all values to 0)</string>
-    <string name="watchface_setting_wrist_flick_move_relative">Move hands relative to time:</string>
-    <string name="watchface_setting_wrist_flick_hour">Hour hand (-360 to 360):</string>
-    <string name="watchface_setting_wrist_flick_minute">Minute hand (-360 to 360):</string>
-    <string name="watchface_setting_wrist_flick_duration">Duration (in ms):</string>
+    <string name="watchface_setting_wrist_flick_move_relative">Move hands relative to time</string>
+    <string name="watchface_setting_wrist_flick_hour">Hour hand (-360 to 360)</string>
+    <string name="watchface_setting_wrist_flick_minute">Minute hand (-360 to 360)</string>
+    <string name="watchface_setting_wrist_flick_duration">Duration (in ms)</string>
+    <string name="watchface_setting_title_custom_events">Custom events</string>
+    <string name="watchface_setting_button_toggle_widgets">Toggle widgets</string>
+    <string name="watchface_setting_button_toggle_backlight">Turn backlight on</string>
     <string name="watchface_cache_confirm_overwrite">A watchface with this name already exists in the cache. Do you want to overwrite it?</string>
     <string name="watchface_upload_failed">Upload of the watchface failed. Please try again.</string>
     <string name="watchface_widget_type_battery">Battery</string>
@@ -1474,6 +1545,10 @@
     <string name="watchface_setting_title_power_saving">Power saving</string>
     <string name="watchface_setting_power_saving_display">Disable display updates while off wrist</string>
     <string name="watchface_setting_power_saving_hands">Disable hands movement while off wrist</string>
+    <string name="watchface_dialog_widget_background">Background</string>
+    <string name="hybridhr_widget_bg_thin_circle">Thin circle</string>
+    <string name="hybridhr_widget_bg_double_circle">Double circle</string>
+    <string name="hybridhr_widget_bg_dashed_circle">Dashed circle</string>
     <string name="prefs_sleep_time">Sleep times</string>
     <string name="prefs_sleep_time_label">Define sleep hours</string>
     <string name="prefs_sleep_time_summary">Specifies times when sleep is registered</string>
@@ -1563,7 +1638,11 @@
     <string name="pref_voice_detect_duration_5">5 seconds</string>
     <string name="pref_voice_detect_duration_10">10 seconds</string>
     <string name="pref_voice_detect_duration_15">15 seconds</string>
-
+    <string name="pref_header_heartrate_sleep">Sleep</string>
+    <string name="pref_header_heartrate_allday">All-day monitoring</string>
+    <string name="pref_header_heartrate_alerts">Heart rate alerts</string>
+    <string name="pref_header_stress">Stress</string>
+    <string name="pref_header_spo2">Blood Oxygen</string>
     <string name="pref_header_sony_ambient_sound_control">Ambient Sound Control</string>
     <string name="pref_header_sony_device_info">Device Information</string>
     <string name="sony_ambient_sound">Mode</string>
@@ -1650,12 +1729,13 @@
     <string name="sony_button_mode_ambient_sound_control">Ambient Sound Control</string>
     <string name="sony_button_mode_playback_control">Playback Control</string>
     <string name="sony_button_mode_volume_control">Volume Control</string>
+    <string name="pref_screen_brightness">Screen Brightness</string>
     <string name="watchface_widget_type_custom">Custom widget</string>
-    <string name="watchface_dialog_widget_timezone">Time zone:</string>
-    <string name="watchface_dialog_widget_timezone_duration">Clock visibility duration (in seconds):</string>
-    <string name="watchface_dialog_widget_update_timeout">Update timeout in minutes:</string>
-    <string name="watchface_dialog_widget_timeout_hide_text">Hide text on timeout:</string>
-    <string name="watchface_dialog_widget_timeout_show_circle">Show circle on timeout:</string>
+    <string name="watchface_dialog_widget_timezone">Time zone</string>
+    <string name="watchface_dialog_widget_timezone_duration">Clock visibility duration (in seconds)</string>
+    <string name="watchface_dialog_widget_update_timeout">Update timeout in minutes</string>
+    <string name="watchface_dialog_widget_timeout_hide_text">Hide text on timeout</string>
+    <string name="watchface_dialog_widget_timeout_show_circle">Show circle on timeout</string>
     <string name="qhybrid_title_on_device_confirmation">Enable on-device pairing confirmation</string>
     <string name="qhybrid_summary_on_device_confirmation">On-device pairing confirmations can get annoying. Disabling them might lose you functionality.</string>
     <string name="devicetype_vesc">VESC</string>
@@ -1695,7 +1775,6 @@
 
     <string name="menuitem_menu">Menu</string>
     <string name="fossil_hr_button_config_info">Some buttons cannot be configured because their functions are hard-coded in the watch firmware.\n\nWarning: long-pressing the upper button when a watchface from the official Fossil app is installed will also toggle between showing/hiding widgets.</string>
-    <string name="watchface_dialog_widget_width">Width:</string>
     <string name="pref_title_opentracks_packagename">OpenTracks package name</string>
     <string name="pref_summary_opentracks_packagename">Used for starting/stopping GPS track recording in external fitness app.</string>
     <string name="watchface_dialog_pre_setting_position">pre-setting position to %s</string>
@@ -1719,4 +1798,28 @@
     <string name="connection_over_bt_classic">Connection over Bluetooth classic</string>
     <string name="autoconnect_from_device_title">Connect on connection from device</string>
     <string name="autoconnect_from_device_summary">Establish a connection when connection is initiated by device, like headphones</string>
+    <!-- related to steps streak view -->
+    <string name="steps_streaks">Steps streaks</string>
+    <string name="steps_streaks_hint">Series of consecutive days without interruption with steps goal being reached</string>
+    <string name="step_streak_ongoing">Ongoing</string>
+    <string name="step_streak_longest">Longest</string>
+    <string name="step_streak_total">Total</string>
+    <string name="steps_streaks_total_steps">Total\nsteps</string>
+    <string name="steps_streaks_streak_days">Streak\nDays</string>
+    <string name="steps_streaks_average_steps">Average\nsteps</string>
+    <string name="steps_streaks_achievement_rate">Achievement\nrate</string>
+    <string name="steps_streaks_since_date">Since %s</string>
+    <string name="step_streak_average_steps_hint">Average steps per day of the streak</string>
+    <string name="steps_streaks_total_steps_hint_totals">Total number of steps ever recorded</string>
+    <string name="steps_streaks_total_days_hint_totals">Percentage of days with achieved goal in relation to all days with steps</string>
+    <string name="step_streak_days_hint">Number of consecutive days with steps goal being reached</string>
+    <string name="steps_streaks_total_steps_hint">Total number of steps in the whole streak</string>
+    <string name="steps_streaks_total_steps_average_hint">Total average %d steps per day</string>
+    <string name="step_streaks_achievements_sharing_message">My daily step achievements!</string>
+    <string name="step_streaks_achievements_sharing_title">Steps Achievements</string>
+    <string name="prefs_hourly_chime">Hourly chime</string>
+    <string name="prefs_hourly_chime_summary">The watch will beep once an hour</string>
+    <string name="devicetype_flipper_zero">Flipper zero</string>
+    <string name="activity_prefs_allow_bluetooth_intent_api">Bluetooth Intent API</string>
+    <string name="activity_prefs_summary_allow_bluetooth_intent_api">Allow controlling Bluetooth connection via Intent API</string>
 </resources>

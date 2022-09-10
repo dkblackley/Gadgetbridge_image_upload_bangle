@@ -95,6 +95,7 @@ public class AmazfitGTS2eCoordinator extends HuamiCoordinator {
     public int[] getSupportedDeviceSpecificSettings(GBDevice device) {
         return new int[]{
                 R.xml.devicesettings_amazfitgtsgtr2,
+                R.xml.devicesettings_vibrationpatterns,
                 R.xml.devicesettings_wearlocation,
                 R.xml.devicesettings_heartrate_sleep,
                 R.xml.devicesettings_goal_notification,
@@ -109,12 +110,6 @@ public class AmazfitGTS2eCoordinator extends HuamiCoordinator {
                 R.xml.devicesettings_device_actions,
                 R.xml.devicesettings_high_mtu,
                 R.xml.devicesettings_transliteration
-        };
-    }
-    @Override
-    public int[] getSupportedDeviceSpecificAuthenticationSettings() {
-        return new int[]{
-                R.xml.devicesettings_pairingkey
         };
     }
 }

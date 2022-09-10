@@ -32,6 +32,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.widget.Toast;
@@ -53,6 +54,7 @@ import nodomain.freeyourgadget.gadgetbridge.GBException;
 import nodomain.freeyourgadget.gadgetbridge.R;
 import nodomain.freeyourgadget.gadgetbridge.activities.HeartRateUtils;
 import nodomain.freeyourgadget.gadgetbridge.devices.DeviceCoordinator;
+import nodomain.freeyourgadget.gadgetbridge.entities.Device;
 import nodomain.freeyourgadget.gadgetbridge.externalevents.AlarmClockReceiver;
 import nodomain.freeyourgadget.gadgetbridge.externalevents.AlarmReceiver;
 import nodomain.freeyourgadget.gadgetbridge.externalevents.BluetoothConnectReceiver;
@@ -108,6 +110,7 @@ import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.ACTION_FI
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.ACTION_HEARTRATE_TEST;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.ACTION_INSTALL;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.ACTION_NOTIFICATION;
+import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.ACTION_PHONE_FOUND;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.ACTION_POWER_OFF;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.ACTION_READ_CONFIGURATION;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.ACTION_REQUEST_APPINFO;
@@ -143,8 +146,11 @@ import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CAL
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALENDAREVENT_ID;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALENDAREVENT_LOCATION;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALENDAREVENT_TIMESTAMP;
+import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALENDAREVENT_ALLDAY;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALENDAREVENT_TITLE;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALENDAREVENT_TYPE;
+import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALENDAREVENT_CALNAME;
+import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALENDAREVENT_COLOR;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALL_COMMAND;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALL_DISPLAYNAME;
 import static nodomain.freeyourgadget.gadgetbridge.model.DeviceService.EXTRA_CALL_DNDSUPPRESSED;
@@ -335,6 +341,68 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
             "com.spotify.music.playbackstatechanged"
     };
 
+    private final String COMMAND_BLUETOOTH_CONNECT = "nodomain.freeyourgadget.gadgetbridge.BLUETOOTH_CONNECT";
+    private final String ACTION_DEVICE_CONNECTED = "nodomain.freeyourgadget.gadgetbridge.BLUETOOTH_CONNECTED";
+    private boolean allowBluetoothIntentApi = false;
+
+    private void sendDeviceConnectedBroadcast(String address){
+        if(!allowBluetoothIntentApi){
+            GB.log("not sending API event due to settings", GB.INFO, null);
+            return;
+        }
+        Intent intent = new Intent(ACTION_DEVICE_CONNECTED);
+        intent.putExtra("EXTRA_DEVICE_ADDRESS", address);
+
+        sendBroadcast(intent);
+    }
+
+    BroadcastReceiver bluetoothCommandReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()){
+                case COMMAND_BLUETOOTH_CONNECT:
+                    if(!allowBluetoothIntentApi){
+                        GB.log("Connection API not allowed in settings", GB.ERROR, null);
+                        return;
+                    }
+                    Bundle extras = intent.getExtras();
+                    if(extras == null){
+                        GB.log("no extras provided in Intent", GB.ERROR, null);
+                        return;
+                    }
+                    String address = extras.getString("EXTRA_DEVICE_ADDRESS", "");
+                    if(address.isEmpty()){
+                        GB.log("no bluetooth address provided in Intent", GB.ERROR, null);
+                        return;
+                    }
+                    if(isDeviceConnected(address)){
+                        GB.log(String.format("device %s already connected", address), GB.INFO, null);
+                        sendDeviceConnectedBroadcast(address);
+                        return;
+                    }
+
+                    List<GBDevice> devices = GBApplication.app().getDeviceManager().getDevices();
+                    GBDevice targetDevice = GBApplication
+                            .app()
+                            .getDeviceManager()
+                            .getDeviceByAddress(address);
+
+                    if(targetDevice == null){
+                        GB.log(String.format("device %s not registered", address), GB.ERROR, null);
+                        return;
+                    }
+
+                    GB.log(String.format("connecting to %s", address), GB.INFO, null);
+
+                    GBApplication
+                            .deviceService(targetDevice)
+                            .connect();
+
+                    break;
+            }
+        }
+    };
+
     /**
      * For testing!
      *
@@ -364,6 +432,10 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
                     cachedStruct.setCoordinator(newCoordinator);
                 }
                 updateReceiversState();
+
+                if(device.isInitialized()){
+                    sendDeviceConnectedBroadcast(device.getAddress());
+                }
             }
         }
     };
@@ -405,9 +477,17 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
         mBlueToothConnectReceiver = new BluetoothConnectReceiver(this);
         registerReceiver(mBlueToothConnectReceiver, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
 
+        mAutoConnectInvervalReceiver= new AutoConnectIntervalReceiver(this);
+        registerReceiver(mAutoConnectInvervalReceiver, new IntentFilter("GB_RECONNECT"));
+
         if (hasPrefs()) {
             getPrefs().getPreferences().registerOnSharedPreferenceChangeListener(this);
+            allowBluetoothIntentApi = getPrefs().getBoolean(GBPrefs.PREF_ALLOW_INTENT_API, false);
         }
+
+        IntentFilter bluetoothCommandFilter = new IntentFilter();
+        bluetoothCommandFilter.addAction(COMMAND_BLUETOOTH_CONNECT);
+        registerReceiver(bluetoothCommandReceiver, bluetoothCommandFilter);
     }
 
     private DeviceSupportFactory getDeviceSupportFactory() {
@@ -646,9 +726,12 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
                 calendarEventSpec.type = intent.getByteExtra(EXTRA_CALENDAREVENT_TYPE, (byte) -1);
                 calendarEventSpec.timestamp = intent.getIntExtra(EXTRA_CALENDAREVENT_TIMESTAMP, -1);
                 calendarEventSpec.durationInSeconds = intent.getIntExtra(EXTRA_CALENDAREVENT_DURATION, -1);
+                calendarEventSpec.allDay = intent.getBooleanExtra(EXTRA_CALENDAREVENT_ALLDAY, false);
                 calendarEventSpec.title = sanitizeNotifText(intent.getStringExtra(EXTRA_CALENDAREVENT_TITLE), device);
                 calendarEventSpec.description = sanitizeNotifText(intent.getStringExtra(EXTRA_CALENDAREVENT_DESCRIPTION), device);
                 calendarEventSpec.location = sanitizeNotifText(intent.getStringExtra(EXTRA_CALENDAREVENT_LOCATION), device);
+                calendarEventSpec.calName = sanitizeNotifText(intent.getStringExtra(EXTRA_CALENDAREVENT_CALNAME), device);
+                calendarEventSpec.color = intent.getIntExtra(EXTRA_CALENDAREVENT_COLOR, 0);
                 deviceSupport.onAddCalendarEvent(calendarEventSpec);
                 break;
             }
@@ -688,6 +771,10 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
             case ACTION_FIND_DEVICE: {
                 boolean start = intent.getBooleanExtra(EXTRA_FIND_START, false);
                 deviceSupport.onFindDevice(start);
+                break;
+            }
+            case ACTION_PHONE_FOUND: {
+                deviceSupport.onPhoneFound();
                 break;
             }
             case ACTION_SET_CONSTANT_VIBRATION: {
@@ -925,6 +1012,9 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
         }
         for(DeviceStruct struct : deviceStructs){
             if(struct.getDevice().equals(device)){
+                if(struct.getDeviceSupport() == null)
+                    throw new DeviceNotFoundException(device);
+
                 return struct.getDeviceSupport();
             }
         }
@@ -944,8 +1034,12 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
     }
 
     private boolean isDeviceConnected(GBDevice device) {
+        return isDeviceConnected(device.getAddress());
+    }
+
+    private boolean isDeviceConnected(String deviceAddress) {
         for(DeviceStruct struct : deviceStructs){
-            if(struct.getDevice().equals(device) ){
+            if(struct.getDevice().getAddress().compareToIgnoreCase(deviceAddress) == 0){
                 return struct.getDevice().isConnected();
             }
         }
@@ -953,8 +1047,12 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
     }
 
     private boolean isDeviceConnecting(GBDevice device) {
+        return isDeviceConnecting(device.getAddress());
+    }
+
+    private boolean isDeviceConnecting(String deviceAddress) {
         for(DeviceStruct struct : deviceStructs){
-            if(struct.getDevice().equals(device) ){
+            if(struct.getDevice().getAddress().compareToIgnoreCase(deviceAddress) == 0){
                 return struct.getDevice().isConnecting();
             }
         }
@@ -962,8 +1060,12 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
     }
 
     private boolean isDeviceInitialized(GBDevice device) {
+        return isDeviceInitialized(device.getAddress());
+    }
+
+    private boolean isDeviceInitialized(String deviceAddress) {
         for(DeviceStruct struct : deviceStructs){
-            if(struct.getDevice().equals(device) ){
+            if(struct.getDevice().getAddress().compareToIgnoreCase(deviceAddress) == 0){
                 return struct.getDevice().isInitialized();
             }
         }
@@ -1095,10 +1197,6 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
                 mGBAutoFetchReceiver = new GBAutoFetchReceiver();
                 registerReceiver(mGBAutoFetchReceiver, new IntentFilter("android.intent.action.USER_PRESENT"));
             }
-            if (mAutoConnectInvervalReceiver == null) {
-                mAutoConnectInvervalReceiver= new AutoConnectIntervalReceiver(this);
-                registerReceiver(mAutoConnectInvervalReceiver, new IntentFilter("GB_RECONNECT"));
-            }
         } else {
             if (mPhoneCallReceiver != null) {
                 unregisterReceiver(mPhoneCallReceiver);
@@ -1149,11 +1247,6 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
                 unregisterReceiver(mGBAutoFetchReceiver);
                 mGBAutoFetchReceiver = null;
             }
-            if (mAutoConnectInvervalReceiver != null) {
-                unregisterReceiver(mAutoConnectInvervalReceiver);
-                mAutoConnectInvervalReceiver.destroy();
-                mAutoConnectInvervalReceiver = null;
-            }
         }
     }
 
@@ -1170,6 +1263,11 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
         setReceiversEnableState(false, false, null, null); // disable BroadcastReceivers
 
         unregisterReceiver(mBlueToothConnectReceiver);
+        mBlueToothConnectReceiver = null;
+
+        unregisterReceiver(mAutoConnectInvervalReceiver);
+        mAutoConnectInvervalReceiver.destroy();
+        mAutoConnectInvervalReceiver = null;
 
         for(GBDevice device : getGBDevices()){
             try {
@@ -1179,6 +1277,8 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
             }
         }
         GB.removeNotification(GB.NOTIFICATION_ID, this); // need to do this because the updated notification won't be cancelled when service stops
+
+        unregisterReceiver(bluetoothCommandReceiver);
     }
 
     @Override
@@ -1196,6 +1296,10 @@ public class DeviceCommunicationService extends Service implements SharedPrefere
         }
         if (GBPrefs.CHART_MAX_HEART_RATE.equals(key) || GBPrefs.CHART_MIN_HEART_RATE.equals(key)) {
             HeartRateUtils.getInstance().updateCachedHeartRatePreferences();
+        }
+        if (GBPrefs.PREF_ALLOW_INTENT_API.equals(key)){
+            allowBluetoothIntentApi = sharedPreferences.getBoolean(GBPrefs.PREF_ALLOW_INTENT_API, false);
+            GB.log("allowBluetoothIntentApi changed to " + allowBluetoothIntentApi, GB.INFO, null);
         }
     }
 
